@@ -1,0 +1,7 @@
+enum UserRole {
+  PHOTOGRAPHER,
+  GUIDER,
+  JUST_USER,
+  PLACE,
+  ADMIN,
+}

@@ -1,0 +1,2 @@
+/Users/idevendra/Documents/localguider/android/app/.cxx/Debug/4rc3f5v1/x86_64/CMakeFiles/edit_cache.dir
+/Users/idevendra/Documents/localguider/android/app/.cxx/Debug/4rc3f5v1/x86_64/CMakeFiles/rebuild_cache.dir

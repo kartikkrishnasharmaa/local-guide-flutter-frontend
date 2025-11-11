@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "738703111241",
+    "project_id": "local-guider-dr",
+    "storage_bucket": "local-guider-dr.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:738703111241:android:8fe4c3ce477a4dbfeabb98",
+        "android_client_info": {
+          "package_name": "com.localguider.localguider"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBEnRI2w3NnplQ_r39gWKRsFG7geb5VAXc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

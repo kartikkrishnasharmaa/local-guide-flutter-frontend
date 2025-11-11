@@ -1,0 +1,103 @@
+name: localguider
+description: "Local Guider"
+
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.5.4
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_bloc:
+  bloc:
+  dio:
+  pretty_dio_logger:
+  shared_preferences:
+  google_fonts:
+  gap:
+    git:
+      url: https://github.com/esDotDev/gap.git
+      ref: dc980bf
+  cached_network_image:
+
+  flutter_staggered_grid_view:
+  image_fade:
+  get:
+  flutter_svg:
+  intl:
+  firebase_core:
+  firebase_auth:
+  firebase_messaging:
+  permission_handler:
+  firebase_crashlytics:
+  image_picker:
+  device_info_plus:
+  otp_pin_field: ^1.4.1
+  google_maps_flutter:
+  cupertino_icons:
+  flutter_rating_bar:
+  infinite_scroll_pagination:
+  geolocator:
+  geocoding:
+  flutter_image_compress:
+  awesome_dialog:
+  image:
+  razorpay_flutter:
+    git:
+      url: https://github.com/nikb7/razorpay-flutter.git
+      ref: fluuter-v1-embedding
+  url_launcher:
+  excel:
+  path_provider:
+  universal_html:
+  readmore:
+  share_plus:
+  pdf:
+  printing:
+  open_file:
+  webview_flutter:
+
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints:
+
+
+flutter:
+
+  uses-material-design: true
+  assets:
+    - assets/logo/
+    - assets/images/
+    - assets/images/svg/
+
+  fonts:
+    - family: FuturaLight
+      fonts:
+        - asset: assets/fonts/futura_light.ttf
+    - family: FuturaRegular
+      fonts:
+        - asset: assets/fonts/futura_regular.ttf
+    - family: FuturaMedium
+      fonts:
+        - asset: assets/fonts/futura_medium.ttf
+    - family: FuturaBold
+      fonts:
+        - asset: assets/fonts/futura_bold.ttf
+    - family: OpenSansLight
+      fonts:
+        - asset: assets/fonts/open_sans_light.ttf
+    - family: OpenSansRegular
+      fonts:
+        - asset: assets/fonts/open_sans_regular.ttf
+    - family: OpenSansMedium
+      fonts:
+        - asset: assets/fonts/open_sans_semi_bold.ttf
+    - family: OpenSansBold
+      fonts:
+        - asset: assets/fonts/open_sans_bold.ttf
