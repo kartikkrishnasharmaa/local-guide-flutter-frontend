@@ -1,6 +1,9 @@
 import 'package:localguider/models/serializable.dart';
 
 class PlacesResponse extends Serializable {
+  List<Predictions>? predictions;
+  String? status;
+
   PlacesResponse({this.predictions, this.status});
 
   PlacesResponse.fromJson(dynamic json) {
@@ -13,25 +16,29 @@ class PlacesResponse extends Serializable {
     status = json['status'];
   }
 
-  List<Predictions>? predictions;
-  String? status;
-
   @override
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
+
     if (predictions != null) {
       map['predictions'] = predictions?.map((v) => v.toJson()).toList();
     }
+
     map['status'] = status;
     return map;
   }
 }
 
 class Predictions extends Serializable {
+  String? description;
+  String? placeId;
+  String? mapUrl;
+  double? latitude;
+  double? longitude;
+
   Predictions({
     this.description,
     this.placeId,
-    this.reference,
     this.mapUrl,
     this.latitude,
     this.longitude,
@@ -39,29 +46,24 @@ class Predictions extends Serializable {
 
   Predictions.fromJson(dynamic json) {
     description = json['description'];
-    placeId = json['place_id'];
-    reference = json['reference'];
-    mapUrl = json['mapUrl'];
-    latitude = json['latitude'];
-    longitude = json['longitude'];
-  }
 
-  String? description;
-  num? placeId;
-  String? reference;
-  String? mapUrl;
-  num? latitude;
-  num? longitude;
+    placeId = json['place_id'];         // FIXED (was num, now String)
+    mapUrl = json['mapUrl'];
+
+    latitude = json['latitude']?.toDouble();   // FIXED
+    longitude = json['longitude']?.toDouble(); // FIXED
+  }
 
   @override
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
+
     map['description'] = description;
     map['place_id'] = placeId;
-    map['reference'] = reference;
     map['mapUrl'] = mapUrl;
     map['latitude'] = latitude;
     map['longitude'] = longitude;
+
     return map;
   }
 }

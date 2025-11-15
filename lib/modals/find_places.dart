@@ -14,21 +14,28 @@ import '../maps/places_response.dart';
 import '../responsive.dart';
 
 class FindPlaces extends StatefulWidget {
-
   String? title;
   bool showCurrentLocationBtn = true;
   bool isCitiesOnly = false;
   Function(Predictions? place, LatLng? latLng) onPlaceSelected;
-  FindPlaces({super.key, required this.onPlaceSelected, this.title, this.showCurrentLocationBtn = true, this.isCitiesOnly = false});
+
+  FindPlaces({
+    super.key,
+    required this.onPlaceSelected,
+    this.title,
+    this.showCurrentLocationBtn = true,
+    this.isCitiesOnly = false,
+  });
 
   @override
   State<FindPlaces> createState() => _FindPlacesState();
 }
 
 class _FindPlacesState extends BaseState<FindPlaces, AuthBloc> {
-  List<Predictions> predictions = [];
   final TextEditingController _placeController = TextEditingController();
-  var isSearching = false;
+  List<Predictions> predictions = [];
+
+  bool isSearching = false;
 
   @override
   void init() {
@@ -51,22 +58,24 @@ class _FindPlacesState extends BaseState<FindPlaces, AuthBloc> {
         toolbarHeight: 185,
         title: Column(
           children: [
-           Row(
+            Row(
               children: [
                 IconButton(
-                  onPressed: () {
-                    navigatePop(context);
-                  },
-                  icon: Icon(Icons.arrow_back_ios_new_rounded,
-                      color: $styles.colors.title),
+                  onPressed: () => navigatePop(context),
+                  icon: Icon(
+                    Icons.arrow_back_ios_new_rounded,
+                    color: $styles.colors.title,
+                  ),
                 ),
                 CustomText(
                   widget.title ?? "Pick Address For Better Results",
                   fontSize: titleSize(),
                   isBold: true,
-                )
+                ),
               ],
             ),
+
+            /// Search Input
             gap(context, height: 10),
             InputField(
               hint: $strings.searchPlaces,
@@ -74,132 +83,144 @@ class _FindPlacesState extends BaseState<FindPlaces, AuthBloc> {
               focusStrokeColor: $styles.colors.white,
               enabledStrokeColor: $styles.colors.white,
               bgColor: $styles.colors.white,
+              disableLabel: true,
               iconStart:
                   Icon(Icons.search_rounded, color: $styles.colors.black),
-              disableLabel: true,
             ),
+
             gap(context, height: 15),
-            if(widget.showCurrentLocationBtn) DefaultButton("Use Current Location",
+
+            /// Current Location Button
+            if (widget.showCurrentLocationBtn)
+              DefaultButton(
+                "Use Current Location",
                 iconStart: Icon(
                   Icons.location_searching,
                   color: $styles.colors.white,
                   size: 15,
-                ), onClick: () {
-              showLoading();
-              _determinePosition().then((value) {
-                dismissLoading();
-                if(!mounted) return;
-                navigatePop(context);
-                widget.onPlaceSelected(
-                    null, LatLng(value.latitude, value.longitude));
-              });
-            })
+                ),
+                onClick: () {
+                  showLoading();
+                  _determinePosition().then((value) {
+                    dismissLoading();
+                    if (!mounted) return;
+                    navigatePop(context);
+                    widget.onPlaceSelected(
+                        null, LatLng(value.latitude, value.longitude));
+                  });
+                },
+              ),
           ],
         ),
       ),
-      body: SingleChildScrollView(
-        child: Container(
-          decoration: BoxDecoration(
-            shape: BoxShape.rectangle,
-            color: $styles.colors.secondarySurface,
-            borderRadius: BorderRadius.only(
-                topRight: Radius.circular(sizing(10, context)),
-                topLeft: Radius.circular(sizing(10, context))),
-          ),
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom,
-            left: sizing(10, context),
-            right: sizing(10, context),
-            top: sizing(10, context),
-          ),
-          child: Column(
-            children: [
-              StreamBuilder(
-                  stream: bloc.loadingController.stream,
-                  builder: (context, snapshot) {
-                    return (snapshot.data ?? false)
-                        ? Center(
-                            child: Padding(
-                              padding: EdgeInsets.all(sizing(20, context)),
-                              child: CircularProgressIndicator(
-                                color: $styles.colors.blue,
+
+      body: Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: sizing(10, context),
+          vertical: sizing(10, context),
+        ),
+        child: Column(
+          children: [
+            /// Loading Indicator
+            StreamBuilder(
+              stream: bloc.loadingController.stream,
+              builder: (context, snapshot) {
+                return (snapshot.data ?? false)
+                    ? Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(sizing(20, context)),
+                          child: CircularProgressIndicator(
+                            color: $styles.colors.blue,
+                          ),
+                        ),
+                      )
+                    : Container();
+              },
+            ),
+
+            /// Places Result List
+            Expanded(
+              child: StreamBuilder<BaseListCallback<Predictions>?>(
+                stream: bloc.placesResponseStream.stream,
+                builder: (context, snapshot) {
+                  final result = snapshot.data?.data;
+
+                  /// No result found
+                  if (snapshot.hasData &&
+                      result != null &&
+                      result.isEmpty &&
+                      !isSearching) {
+                    return Center(
+                      child: CustomText("No Result"),
+                    );
+                  }
+
+                  /// Show list when data comes
+                  if (snapshot.hasData &&
+                      result != null &&
+                      result.isNotEmpty) {
+                    predictions = result;
+
+                    return ListView.builder(
+                      itemCount: predictions.length,
+                      itemBuilder: (context, index) {
+                        final item = predictions[index];
+
+                        return CustomInkWell(
+                          bgColor: $styles.colors.white,
+                          onTap: () {
+                            widget.onPlaceSelected(
+                              item,
+                              LatLng(
+                                item.latitude!.toDouble(),
+                                item.longitude!.toDouble(),
                               ),
+                            );
+                            navigatePop(context);
+                          },
+                          child: Padding(
+                            padding: EdgeInsets.all(sizing(15, context)),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                CustomText(
+                                  item.description ?? "",
+                                  fontSize: 16,
+                                  color: Colors.black,
+                                ),
+                                gap(context, height: 5),
+                                CustomText(
+                                  "Lat: ${item.latitude}, Lng: ${item.longitude}",
+                                  fontSize: 12,
+                                  color: Colors.grey,
+                                ),
+                              ],
                             ),
-                          )
-                        : Container();
-                  }),
-              StreamBuilder<BaseListCallback<Predictions>?>(
-                  stream: bloc.placesResponseStream.stream,
-                  builder: (context, snapshot) {
-                    var result = snapshot.data?.data;
-                    var isDefault = true;
-                    var isEmpty = false;
-                    isSearching = false;
-                    if (snapshot.hasData &&
-                        result != null &&
-                        result.isNotEmpty) {
-                      predictions.clear();
-                      predictions = snapshot.data?.data ?? [];
-                      isEmpty = false;
-                      isDefault = false;
-                    } else if (snapshot.hasData &&
-                        result != null &&
-                        result.isEmpty) {
-                      predictions = [];
-                      isEmpty = true;
-                      isDefault = false;
-                    }
-                    return isEmpty
-                        ? Padding(
-                            padding: EdgeInsets.all(sizing(50, context)),
-                            child: CustomText("No Result"),
-                          )
-                        : (isDefault
-                            ? Padding(
-                                padding: EdgeInsets.all(sizing(50, context)),
-                                child: CustomText("Search"),
-                              )
-                            : SizedBox(
-                                height: 300,
-                                child: ListView.builder(
-                                    shrinkWrap: true,
-                                    itemCount: predictions.length,
-                                    itemBuilder: (context, index) {
-                                      return predictions
-                                          .map((e) => CustomInkWell(
-                                              bgColor: $styles.colors.white,
-                                              onTap: () {
-                                                widget.onPlaceSelected(
-                                                    predictions[index], null);
-                                                navigatePop(context);
-                                              },
-                                              child: Padding(
-                                                padding: EdgeInsets.all(
-                                                    sizing(15, context)),
-                                                child: CustomText(
-                                                    e.description ?? ""),
-                                              )))
-                                          .toList()[index];
-                                    }),
-                              ));
-                  }),
-            ],
-          ),
+                          ),
+                        );
+                      },
+                    );
+                  }
+
+                  /// Default message before search
+                  return Center(
+                    child: CustomText("Search"),
+                  );
+                },
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
+  /// Location Permission
   Future<Position> _determinePosition() async {
-    bool serviceEnabled;
-    LocationPermission permission;
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) return Future.error('Location services are disabled.');
 
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      return Future.error('Location services are disabled.');
-    }
-
-    permission = await Geolocator.checkPermission();
+    LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
@@ -209,20 +230,29 @@ class _FindPlacesState extends BaseState<FindPlaces, AuthBloc> {
 
     if (permission == LocationPermission.deniedForever) {
       return Future.error(
-          'Location permissions are permanently denied, we cannot request permissions.');
+        'Location permissions are permanently denied.',
+      );
     }
+
     return await Geolocator.getCurrentPosition();
   }
 
+  /// Search Listener
   @override
   void observer() {
     super.observer();
+
     _placeController.addListener(() {
       if (_placeController.text.isNotEmpty) {
         if (!isSearching) {
           isSearching = true;
-          $logger.log(message: "message>>>>> Search Text  ${_placeController.text.toString()}");
-          bloc.findPlaces(_placeController.text.toString(), widget.isCitiesOnly);
+          bloc.findPlaces(
+            _placeController.text.toString(),
+            widget.isCitiesOnly,
+          );
+          Future.delayed(Duration(milliseconds: 400), () {
+            isSearching = false;
+          });
         }
       }
     });
